@@ -3,16 +3,16 @@ const cors = require('cors');
 const Stripe = require('stripe');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 app.use(cors());
 
-// Health check endpoint so Render knows the service is alive
+// Health check endpoint
 app.get('/', (req, res) => {
-  res.status(200).send('HELLCORE Backend is active and running.');
+  res.status(200).send('HELLCORE Backend is active.');
 });
 
-// Initialize Stripe safely
+// Initialize Stripe
 const stripeKey = process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder';
 const stripe = Stripe(stripeKey, {
   apiVersion: '2026-02-25.preview',
@@ -23,9 +23,6 @@ app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
   let event;
 
   try {
-    if (!process.env.STRIPE_WEBHOOK_SECRET) {
-      console.warn('⚠️ STRIPE_WEBHOOK_SECRET is not set.');
-    }
     event = stripe.webhooks.constructEvent(
       req.body,
       sig,
@@ -57,9 +54,8 @@ app.post('/create-checkout-session', async (req, res) => {
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
       mode: 'payment',
-      managed_payments: { enabled: true },
-      success_url: `${req.headers.origin || 'https://your-site.netlify.app'}/?success=true`,
-      cancel_url: `${req.headers.origin || 'https://your-site.netlify.app'}/?canceled=true`,
+      success_url: `${req.headers.origin || 'https://hellcore-gaming-os.onrender.com'}/?success=true`,
+      cancel_url: `${req.headers.origin || 'https://hellcore-gaming-os.onrender.com'}/?canceled=true`,
     });
     
     res.json({ url: session.url });
@@ -69,6 +65,6 @@ app.post('/create-checkout-session', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 HELLCORE Backend running on port ${PORT}`);
 });

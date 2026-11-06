@@ -1,0 +1,6 @@
+# Global HTTP/HTTPS traffic routing strategy
+"https://{default}/":
+  type: upstream
+  upstream: "hellcore:http"
+  cache:
+    enabled: false

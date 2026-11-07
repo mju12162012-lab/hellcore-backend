@@ -25,3 +25,13 @@ applications:
       "/tmp":
         source: storage
         source_path: "tmp"
+routes:
+  # 1. Primary non-www domain serving your application upstream
+  "https://{default}/":
+    type: upstream
+    upstream: "myapp:http"
+
+  # 2. Redirect rule from www to non-www domain
+  "https://www.{default}/":
+    type: redirect
+    to: "https://{default}/"
